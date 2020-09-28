@@ -3,8 +3,6 @@ package com.chrisalbright.ffshow.service;
 import com.chrisalbright.ffshow.config.OMDBConfiguration;
 import com.chrisalbright.ffshow.model.Movie;
 import com.chrisalbright.ffshow.repository.MovieRepository;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,28 +16,24 @@ public class MovieService {
   private final WebClient omdbWebClient;
   private final OMDBConfiguration omdbConfiguration;
 
-  @Getter
-  @EqualsAndHashCode
-  @RequiredArgsConstructor
-  private static class Tuple {
-    private final Movie movie;
-    private final Mono<Movie> movieMono;
+  private static Mono<Movie> hydrateMovie(WebClient client, OMDBConfiguration conf, Movie movie) {
+    return client.get()
+        .uri("?apikey={apiKey}&i={movieId}", conf.getApiKey(), movie.getImdbId())
+        .retrieve()
+        .bodyToMono(Movie.class)
+        .map(movieDetails -> movieDetails.withId(movie.getId()));
+
   }
 
+  public Mono<Movie> getMovieById(Integer id) {
+    return Mono
+        .justOrEmpty(repo.findById(id))
+        .flatMap(movie -> hydrateMovie(omdbWebClient, omdbConfiguration, movie));
+  }
 
-  public Flux<Movie> getMovieDetails() {
+  public Flux<Movie> getAllMovies() {
     return Flux
         .fromIterable(repo.findAll())
-        .map(movie ->
-            new Tuple(movie,
-                omdbWebClient
-                    .get()
-                    .uri("?apikey={apiKey}&i={movieId}", omdbConfiguration.getApiKey(), movie.getImdbId())
-                    .retrieve()
-                    .bodyToMono(Movie.class)
-            )
-        ).flatMap(tuple -> tuple
-            .getMovieMono()
-            .map(movie -> movie.withId(tuple.getMovie().getId())));
+        .flatMap(movie -> hydrateMovie(omdbWebClient, omdbConfiguration, movie));
   }
 }
