@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: "jdbc:h2:file:/tmp/ffshow"
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: true
+
+omdb:
+  base-url: "https://www.omdbapi.com/"
