@@ -2,6 +2,7 @@ package com.chrisalbright.ffshow.service;
 
 import com.chrisalbright.ffshow.config.OMDBConfiguration;
 import com.chrisalbright.ffshow.model.Movie;
+import com.chrisalbright.ffshow.model.OMDBMovieDetails;
 import com.chrisalbright.ffshow.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,13 @@ public class MovieService {
     return client.get()
         .uri("?apikey={apiKey}&i={movieId}", conf.getApiKey(), movie.getImdbId())
         .retrieve()
-        .bodyToMono(Movie.class)
-        .map(movieDetails -> movieDetails.withId(movie.getId()));
+        .bodyToMono(OMDBMovieDetails.class)
+        .map(md -> movie
+            .withTitle(md.getTitle())
+            .withRating(md.getRating())
+            .withPlot(md.getPlot())
+            .withReleaseYear(md.getReleaseYear())
+        );
 
   }
 

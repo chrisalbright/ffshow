@@ -1,13 +1,12 @@
 package com.chrisalbright.ffshow.model;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Getter
@@ -18,30 +17,29 @@ import java.io.Serializable;
 public class Movie implements Serializable {
 
   @Id
-  @With
   Integer id;
+
+  @JsonManagedReference(value = "movie")
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "movie")
+  List<ShowTime> showTimes;
 
   @JsonIgnore
   private String imdbId;
 
+  @With
   @Transient
-  @JsonAlias("Title")
   private String title;
 
+  @With
   @Transient
-  @JsonAlias("Year")
   Integer releaseYear;
 
+  @With
   @Transient
-  @JsonAlias("Type")
-  String type;
-
-  @Transient
-  @JsonAlias("Rated")
   String rating;
 
+  @With
   @Transient
-  @JsonAlias("Plot")
   String plot;
 
 }
