@@ -2,21 +2,24 @@ package com.chrisalbright.ffshow.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.With;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
+@With
 @NoArgsConstructor
 @AllArgsConstructor
 public class Movie implements Serializable {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   Integer id;
 
   @JsonManagedReference(value = "movie")
@@ -26,20 +29,19 @@ public class Movie implements Serializable {
   @JsonIgnore
   private String imdbId;
 
-  @With
   @Transient
   private String title;
 
-  @With
   @Transient
   Integer releaseYear;
 
-  @With
   @Transient
-  String rating;
+  String rated;
 
-  @With
   @Transient
-  String plot;
+  String description;
+
+  @Transient
+  String imdbRating;
 
 }

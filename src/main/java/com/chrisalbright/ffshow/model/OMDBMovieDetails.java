@@ -14,9 +14,12 @@ public class OMDBMovieDetails {
   Integer releaseYear;
 
   @JsonAlias("Rated")
-  String rating;
+  String rated;
 
   @JsonAlias("Plot")
   String plot;
+
+  @JsonAlias("imdbRating")
+  String imdbRating;
 
 }

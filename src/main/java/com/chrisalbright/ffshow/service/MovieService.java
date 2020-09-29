@@ -24,8 +24,9 @@ public class MovieService {
         .bodyToMono(OMDBMovieDetails.class)
         .map(md -> movie
             .withTitle(md.getTitle())
-            .withRating(md.getRating())
-            .withPlot(md.getPlot())
+            .withRated(md.getRated())
+            .withImdbRating(md.getImdbRating())
+            .withDescription(md.getPlot())
             .withReleaseYear(md.getReleaseYear())
         );
 
