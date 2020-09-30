@@ -14,4 +14,4 @@ omdb:
   base-url: "https://www.omdbapi.com/"
 
 security:
-  apiKey: 959e1bfa8382c9e9a0f6ed343115adbd
+  api-key: 959e1bfa8382c9e9a0f6ed343115adbd
