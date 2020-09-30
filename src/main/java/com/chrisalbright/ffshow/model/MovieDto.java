@@ -24,4 +24,6 @@ public class MovieDto {
 
   private Iterable<ShowTime> showTimes = Collections.emptyList();
 
+  private Iterable<Review> reviews = Collections.emptyList();
+
 }

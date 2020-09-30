@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 public class MovieService {
   private final MovieRepository repo;
   private final ShowTimeService showtimeService;
+  private final ReviewService reviewService;
   private final WebClient omdbWebClient;
   private final OMDBConfiguration omdbConfiguration;
 
@@ -28,6 +29,7 @@ public class MovieService {
             .withReleaseYear(omdbMovie.getReleaseYear())
             .withRated(omdbMovie.getRated())
             .withShowTimes(showtimeService.showTimesForMovie(movie))
+            .withReviews(reviewService.reviewsForMovie(movie))
         );
   }
 
