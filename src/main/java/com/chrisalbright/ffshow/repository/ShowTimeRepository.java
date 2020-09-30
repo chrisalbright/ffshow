@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ShowTimeRepository extends CrudRepository<ShowTime, Integer> {
+  Iterable<ShowTime> findAllByMovieId(Integer movieId);
 }

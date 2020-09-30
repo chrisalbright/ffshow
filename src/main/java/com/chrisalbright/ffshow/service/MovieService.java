@@ -2,6 +2,7 @@ package com.chrisalbright.ffshow.service;
 
 import com.chrisalbright.ffshow.config.OMDBConfiguration;
 import com.chrisalbright.ffshow.model.Movie;
+import com.chrisalbright.ffshow.model.MovieDto;
 import com.chrisalbright.ffshow.model.OMDBMovieDetails;
 import com.chrisalbright.ffshow.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,33 +15,42 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MovieService {
   private final MovieRepository repo;
+  private final ShowTimeService showtimeService;
   private final WebClient omdbWebClient;
   private final OMDBConfiguration omdbConfiguration;
 
-  private static Mono<Movie> hydrateMovie(WebClient client, OMDBConfiguration conf, Movie movie) {
+  private Mono<MovieDto> convertMovieEntityToDto(Movie movie) {
+    return fetchOmdbMovie(omdbWebClient, omdbConfiguration, movie)
+        .map(omdbMovie -> new MovieDto()
+            .withTitle(omdbMovie.getTitle())
+            .withDescription(omdbMovie.getPlot())
+            .withImdbRating(omdbMovie.getImdbRating())
+            .withReleaseYear(omdbMovie.getReleaseYear())
+            .withRated(omdbMovie.getRated())
+            .withShowTimes(showtimeService.showTimesForMovie(movie))
+        );
+  }
+
+  private Mono<OMDBMovieDetails> fetchOmdbMovie(WebClient client, OMDBConfiguration conf, Movie movie) {
     return client.get()
         .uri("?apikey={apiKey}&i={movieId}", conf.getApiKey(), movie.getImdbId())
         .retrieve()
-        .bodyToMono(OMDBMovieDetails.class)
-        .map(md -> movie
-            .withTitle(md.getTitle())
-            .withRated(md.getRated())
-            .withImdbRating(md.getImdbRating())
-            .withDescription(md.getPlot())
-            .withReleaseYear(md.getReleaseYear())
-        );
-
+        .bodyToMono(OMDBMovieDetails.class);
   }
 
   public Mono<Movie> getMovieById(Integer id) {
     return Mono
-        .justOrEmpty(repo.findById(id))
-        .flatMap(movie -> hydrateMovie(omdbWebClient, omdbConfiguration, movie));
+        .justOrEmpty(repo.findById(id));
   }
 
-  public Flux<Movie> getAllMovies() {
+  public Mono<MovieDto> getMovieDtoById(Integer id) {
+    return getMovieById(id)
+        .flatMap(this::convertMovieEntityToDto);
+  }
+
+  public Flux<MovieDto> getAllMovies() {
     return Flux
         .fromIterable(repo.findAll())
-        .flatMap(movie -> hydrateMovie(omdbWebClient, omdbConfiguration, movie));
+        .flatMap(this::convertMovieEntityToDto);
   }
 }

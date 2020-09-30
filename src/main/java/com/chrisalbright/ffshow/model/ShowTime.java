@@ -2,6 +2,7 @@ package com.chrisalbright.ffshow.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,10 +22,8 @@ public class ShowTime {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @JsonBackReference(value = "movie")
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "MOVIE_ID")
-  private Movie movie;
+  @JsonIgnore
+  private Integer movieId;
 
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private LocalTime startTime;
