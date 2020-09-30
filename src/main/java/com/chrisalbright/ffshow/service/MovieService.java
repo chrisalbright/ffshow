@@ -1,13 +1,11 @@
 package com.chrisalbright.ffshow.service;
 
-import com.chrisalbright.ffshow.config.OMDBConfiguration;
+import com.chrisalbright.ffshow.http.OMDBClient;
 import com.chrisalbright.ffshow.model.Movie;
 import com.chrisalbright.ffshow.model.MovieDto;
-import com.chrisalbright.ffshow.model.OMDBMovieDetails;
 import com.chrisalbright.ffshow.repository.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,11 +15,10 @@ public class MovieService {
   private final MovieRepository repo;
   private final ShowTimeService showtimeService;
   private final ReviewService reviewService;
-  private final WebClient omdbWebClient;
-  private final OMDBConfiguration omdbConfiguration;
+  private final OMDBClient omdbClient;
 
   private Mono<MovieDto> convertMovieEntityToDto(Movie movie) {
-    return fetchOmdbMovie(omdbWebClient, omdbConfiguration, movie)
+    return omdbClient.fetchOmdbMovie(movie)
         .map(omdbMovie -> new MovieDto()
             .withTitle(omdbMovie.getTitle())
             .withDescription(omdbMovie.getPlot())
@@ -33,12 +30,6 @@ public class MovieService {
         );
   }
 
-  private Mono<OMDBMovieDetails> fetchOmdbMovie(WebClient client, OMDBConfiguration conf, Movie movie) {
-    return client.get()
-        .uri("?apikey={apiKey}&i={movieId}", conf.getApiKey(), movie.getImdbId())
-        .retrieve()
-        .bodyToMono(OMDBMovieDetails.class);
-  }
 
   public Mono<Movie> getMovieById(Integer id) {
     return Mono

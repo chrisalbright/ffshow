@@ -6,7 +6,6 @@ import com.chrisalbright.ffshow.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -23,7 +22,7 @@ public class ReviewService {
     Mono<Review> reviewMono;
     try {
       reviewMono = Mono.just(repo.save(review));
-    } catch (DataIntegrityViolationException ex){
+    } catch (DataIntegrityViolationException ex) {
       reviewMono = Mono.error(ex);
     }
     return reviewMono;
